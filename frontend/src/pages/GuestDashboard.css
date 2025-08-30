@@ -1,0 +1,145 @@
+.guest-dashboard {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 30px;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  color: #2c3e50;
+}
+
+/* Page Title */
+/* Page Title */
+.guest-dashboard h1 {
+  text-align: center;
+  margin-bottom: 40px;
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #fff;
+  padding: 25px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+}
+
+/* Section wrapper */
+.section {
+  margin-bottom: 50px;
+}
+
+/* Section Titles */
+.section h2 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 25px;
+  color: #fff;
+  padding: 15px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+}
+
+/* Rooms & Offers Grid */
+.rooms-list,
+.offers-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+/* Card styling */
+.room-card,
+.offer-card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border: none;
+}
+
+.room-card:hover,
+.offer-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+}
+
+.room-card h3,
+.offer-card h3 {
+  font-size: 1.2rem;
+  margin-bottom: 12px;
+  color: #2c3e50;
+}
+
+.room-card p,
+.offer-card p {
+  margin: 6px 0;
+  color: #555;
+  font-size: 0.95rem;
+}
+
+.offer-card small {
+  display: block;
+  margin-top: 8px;
+  font-size: 0.85rem;
+  color: #888;
+}
+
+/* Booking Form */
+.booking-form {
+  display: grid;
+  gap: 15px;
+  max-width: 500px;
+  margin: 0 auto;
+  background: #ffffff;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+}
+
+.booking-form label {
+  font-weight: 500;
+  font-size: 0.95rem;
+  color: #333;
+}
+
+.booking-form input,
+.booking-form select {
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  outline: none;
+  transition: border 0.2s ease;
+}
+
+.booking-form input:focus,
+.booking-form select:focus {
+  border-color: #6c5ce7;
+  box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.15);
+}
+
+/* Button */
+.booking-form button {
+  background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+  color: #fff;
+  padding: 14px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.booking-form button:hover {
+  background: linear-gradient(135deg, #5a4cd6, #908cfe);
+  transform: translateY(-2px);
+}
+
+/* Message */
+.booking-message {
+  margin-top: 20px;
+  font-weight: 600;
+  font-size: 1rem;
+  text-align: center;
+}
