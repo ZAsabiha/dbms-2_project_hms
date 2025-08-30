@@ -1,0 +1,47 @@
+
+const Room = require('../models/roomModel');
+
+const RoomController = {
+  getRooms: async (req, res) => {
+    try {
+      const rooms = await Room.getAll();
+      res.json(rooms);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: 'Failed to fetch rooms' });
+    }
+  },
+
+  addRoom: async (req, res) => {
+    try {
+      await Room.add(req.body);
+      res.json({ message: 'Room added successfully' });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: 'Failed to add room' });
+    }
+  },
+
+  updateRoom: async (req, res) => {
+    try {
+      await Room.update(req.body);
+      res.json({ message: 'Room updated successfully' });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: 'Failed to update room' });
+    }
+  },
+
+  deactivateRoom: async (req, res) => {
+    try {
+      const { room_id } = req.params;
+      await Room.deactivate(room_id);
+      res.json({ message: 'Room deactivated successfully' });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: 'Failed to deactivate room' });
+    }
+  },
+};
+
+module.exports = RoomController;
