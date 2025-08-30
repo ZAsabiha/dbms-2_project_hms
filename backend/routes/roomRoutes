@@ -1,0 +1,11 @@
+const express = require('express');
+const router = express.Router();
+const RoomController = require('../controllers/roomController');
+
+// Admin-only routes
+router.get('/', RoomController.getRooms);        // View all rooms
+router.post('/', RoomController.addRoom);        // Add a room
+router.put('/', RoomController.updateRoom);     // Edit room details
+router.patch('/deactivate/:room_id', RoomController.deactivateRoom); // Deactivate room
+
+module.exports = router;
