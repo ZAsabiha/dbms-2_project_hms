@@ -1,0 +1,60 @@
+
+const db = require('../config/db');
+
+const Room = {
+  // Get all rooms
+  getAll: async () => {
+    const sql = `SELECT * FROM ROOM ORDER BY ROOM_NUMBER`;
+    const result = await db.query(sql);
+    return result.rows;
+  },
+
+  // Add a new room
+  add: async ({ room_number, room_type, base_price, floor_no, status, notes }) => {
+    // normalize status to match DB constraint
+    const allowedStatus = ['Available','Occupied','Maintenance','Inactive','active','inactive'];
+    if (!allowedStatus.includes(status)) {
+      status = 'Available'; // default if invalid
+    }
+
+    const sql = `
+      INSERT INTO ROOM (ROOM_NUMBER, ROOM_TYPE, BASE_PRICE, FLOOR_NO, STATUS, NOTES)
+      VALUES (:room_number, :room_type, :base_price, :floor_no, :status, :notes)
+    `;
+    const binds = { room_number, room_type, base_price, floor_no, status, notes };
+    await db.query(sql, binds, { autoCommit: true });
+  },
+
+  // Update room details
+  update: async ({ room_id, room_number, room_type, base_price, floor_no, status, notes }) => {
+    const allowedStatus = ['Available','Occupied','Maintenance','Inactive','active','inactive'];
+    if (!allowedStatus.includes(status)) {
+      status = 'Available';
+    }
+
+    const sql = `
+      UPDATE ROOM
+      SET ROOM_NUMBER = :room_number,
+          ROOM_TYPE   = :room_type,
+          BASE_PRICE  = :base_price,
+          FLOOR_NO    = :floor_no,
+          STATUS      = :status,
+          NOTES       = :notes
+      WHERE ROOM_ID = :room_id
+    `;
+    const binds = { room_id, room_number, room_type, base_price, floor_no, status, notes };
+    await db.query(sql, binds, { autoCommit: true });
+  },
+
+  // Deactivate a room (set status = 'Inactive')
+  deactivate: async (room_id) => {
+    const sql = `
+      UPDATE ROOM
+      SET STATUS = 'Inactive'
+      WHERE ROOM_ID = :room_id
+    `;
+    await db.query(sql, { room_id }, { autoCommit: true });
+  },
+};
+
+module.exports = Room;
