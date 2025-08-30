@@ -1,7 +1,45 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
 
-// https://vite.dev/config/
+
+
+import { defineConfig } from "vite"
+import react from "@vitejs/plugin-react"
+
 export default defineConfig({
   plugins: [react()],
+  server: {
+    proxy: {
+      "/auth": {
+        target: "http://localhost:5000",
+        changeOrigin: true,
+      },
+      "/rooms": {
+        target: "http://localhost:5000",
+        changeOrigin: true,
+      },
+      "/reservations": {
+        target: "http://localhost:5000",
+        changeOrigin: true,
+      },
+      "/billing": {
+        target: "http://localhost:5000",
+        changeOrigin: true,
+      },
+      "/dashboard": {
+        target: "http://localhost:5000",
+        changeOrigin: true,
+      },
+      "/staff": {
+        target: "http://localhost:5000",
+        changeOrigin: true,
+      },
+      "/guests": {
+        target: "http://localhost:5000",
+        changeOrigin: true,
+      },
+      "/api": {
+        target: "http://localhost:5000",
+        changeOrigin: true,
+      },
+    },
+  },
 })
