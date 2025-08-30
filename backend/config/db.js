@@ -7,8 +7,8 @@ require('dotenv').config();
 oracledb.outFormat = oracledb.OUT_FORMAT_OBJECT;
 
 const dbConfig = {
-  user: process.env.DB_USER || 'HOTELMANAGEMENT',
-  password: process.env.DB_PASSWORD || 'hotel123',
+  user: process.env.DB_USER || 'use your own connection name',
+  password: process.env.DB_PASSWORD || 'use your own password',
   connectString: process.env.DB_CONNECT_STRING || 'localhost:1521/ORCLPDB',
   poolMin: 1,
   poolMax: 5,
@@ -60,3 +60,4 @@ module.exports = {
  
   getConnection,
 };
+
