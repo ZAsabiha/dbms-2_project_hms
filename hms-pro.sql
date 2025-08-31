@@ -25,3 +25,129 @@ SELECT username, account_status, common FROM dba_users WHERE username = 'HOTELMA
 
 INSERT INTO Admin VALUES (1, 'Admin', 'admin@example.com', 'admin123', 'admin', SYSTIMESTAMP, SYSTIMESTAMP);
 COMMIT;
+
+CREATE TABLE GUEST (
+  GUEST_ID     NUMBER PRIMARY KEY,
+  FULL_NAME    VARCHAR2(100) NOT NULL,
+  PHONE        VARCHAR2(20) UNIQUE,
+  EMAIL        VARCHAR2(120) UNIQUE,
+  ADDRESS      VARCHAR2(200),
+  CREATED_AT   DATE DEFAULT SYSDATE
+);
+
+CREATE TABLE HOTEL_UPDATES (
+  UPDATE_ID   NUMBER PRIMARY KEY,
+  TITLE       VARCHAR2(100) NOT NULL,
+  MESSAGE     VARCHAR2(500) NOT NULL,
+  VALID_UNTIL DATE DEFAULT ADD_MONTHS(SYSDATE, 1)
+);
+
+CREATE SEQUENCE GUEST_SEQ START WITH 1 INCREMENT BY 1 NOCACHE;
+
+-- Special Promotions
+INSERT INTO HOTEL_UPDATES (UPDATE_ID, TITLE, MESSAGE, VALID_UNTIL)
+VALUES (3, 'Weekend Special', 'Enjoy a free breakfast buffet this weekend with every booking!', SYSDATE + 3);
+
+INSERT INTO HOTEL_UPDATES (UPDATE_ID, TITLE, MESSAGE, VALID_UNTIL)
+VALUES (4, 'Winter Package', 'Book a suite and get free spa access throughout December!', ADD_MONTHS(SYSDATE, 2));
+commit;
+
+INSERT INTO HOTEL_UPDATES (UPDATE_ID, TITLE, MESSAGE, VALID_UNTIL)
+VALUES (1, 'Summer Offer', 'Get 20% off on all Deluxe Rooms!', ADD_MONTHS(SYSDATE, 1));
+
+INSERT INTO HOTEL_UPDATES (UPDATE_ID, TITLE, MESSAGE, VALID_UNTIL)
+VALUES (2, 'Check-in Reminder', 'Your reservation check-in starts tomorrow.', SYSDATE+1);
+
+CREATE OR REPLACE TRIGGER GUEST_BI
+BEFORE INSERT ON GUEST
+FOR EACH ROW
+BEGIN
+  IF :NEW.GUEST_ID IS NULL THEN
+    SELECT GUEST_SEQ.NEXTVAL INTO :NEW.GUEST_ID FROM DUAL;
+  END IF;
+END;
+/silent
+
+INSERT INTO GUEST (FULL_NAME, PHONE, EMAIL, ADDRESS)
+VALUES ('John Doe', '01711111111', 'john.doe@mail.com', 'Dhaka, Bangladesh');
+
+INSERT INTO GUEST (FULL_NAME, PHONE, EMAIL, ADDRESS)
+VALUES ('Emma Watson', '01822222222', 'emma.w@mail.com', 'Chattogram, Bangladesh');
+
+-- Example: generate bills manually for existing reservations
+INSERT INTO BILL (BILL_ID, RES_ID, NIGHTS, RATE, TAXES, TOTAL, PAID)
+SELECT 
+    BILL_SEQ.NEXTVAL, 
+    RES_ID,
+    -- use your existing functions to compute nights, rate, taxes, total
+    FN_STAY_DURATION(CHECK_IN, CHECK_OUT) AS NIGHTS,
+    ROUND(FN_ESTIMATE_TOTAL(ROOM_ID, CHECK_IN, CHECK_OUT) / FN_STAY_DURATION(CHECK_IN, CHECK_OUT) / 1.10, 2) AS RATE,
+    ROUND(FN_ESTIMATE_TOTAL(ROOM_ID, CHECK_IN, CHECK_OUT) - (FN_ESTIMATE_TOTAL(ROOM_ID, CHECK_IN, CHECK_OUT)/1.10), 2) AS TAXES,
+    FN_ESTIMATE_TOTAL(ROOM_ID, CHECK_IN, CHECK_OUT) AS TOTAL,
+    'N' AS PAID
+FROM RESERVATION;
+
+INSERT INTO BILL (RES_ID, NIGHTS, RATE, TAXES, TOTAL, PAID) 
+VALUES (306, 3, 4000, 1200, 13200, 'Y');
+
+INSERT INTO BILL (RES_ID, NIGHTS, RATE, TAXES, TOTAL, PAID) 
+VALUES (307, 4, 12000, 4800, 52800, 'Y');
+
+INSERT INTO BILL (RES_ID, NIGHTS, RATE, TAXES, TOTAL, PAID) 
+VALUES (308, 3, 5500, 1650, 18150, 'Y');
+
+-- Unpaid bills for current stays
+INSERT INTO BILL (RES_ID, NIGHTS, RATE, TAXES, TOTAL, PAID) 
+VALUES (303, 3, 8000, 2400, 26400, 'N');
+
+INSERT INTO BILL (RES_ID, NIGHTS, RATE, TAXES, TOTAL, PAID) 
+VALUES (304, 3, 8000, 2400, 26400, 'N');
+
+-- Future booking bills (unpaid)
+INSERT INTO BILL (RES_ID, NIGHTS, RATE, TAXES, TOTAL, PAID) 
+VALUES (305, 4, 5500, 2200, 24200, 'N');
+
+INSERT INTO BILL (RES_ID, NIGHTS, RATE, TAXES, TOTAL, PAID) 
+VALUES (306, 4, 12000, 4800, 52800, 'N');
+
+INSERT INTO BILL (RES_ID, NIGHTS, RATE, TAXES, TOTAL, PAID) 
+VALUES (307, 4, 12000, 4800, 52800, 'N');
+
+
+-- Example: generate bills manually for existing reservations
+INSERT INTO BILL (BILL_ID, RES_ID, NIGHTS, RATE, TAXES, TOTAL, PAID)
+
+-- Updated Procedure (replace BOOLEAN with NUMBER)
+CREATE OR REPLACE PROCEDURE PROC_GENERATE_BILL1(
+  p_res_id IN NUMBER,
+  p_force  IN NUMBER DEFAULT 0  -- 1 = TRUE, 0 = FALSE
+) IS
+  v_exists NUMBER;
+  v_room   NUMBER;
+  v_in     DATE;
+  v_out    DATE;
+  v_nights NUMBER;
+  v_total  NUMBER;
+  v_rate   NUMBER;
+  v_tax    NUMBER;
+BEGIN
+  SELECT COUNT(*) INTO v_exists FROM BILL WHERE RES_ID = p_res_id;
+  
+  SELECT ROOM_ID, CHECK_IN, CHECK_OUT INTO v_room, v_in, v_out
+  FROM RESERVATION WHERE RES_ID = p_res_id;
+  
+  v_nights := FN_STAY_DURATION(v_in, v_out);
+  v_total  := FN_ESTIMATE_TOTAL(v_room, v_in, v_out);
+  v_tax    := ROUND(v_total/1.10 * 0.10, 2);
+  v_rate   := ROUND((v_total - v_tax)/v_nights, 2);
+  
+  IF v_exists = 0 THEN
+    INSERT INTO BILL (BILL_ID, RES_ID, NIGHTS, RATE, TAXES, TOTAL, PAID)
+    VALUES (BILL_SEQ.NEXTVAL, p_res_id, v_nights, v_rate, v_tax, v_total, 'N');
+  ELSIF p_force = 1 THEN  -- Changed from p_force to p_force = 1
+    UPDATE BILL 
+       SET NIGHTS = v_nights, RATE = v_rate, TAXES = v_tax, TOTAL = v_total 
+     WHERE RES_ID = p_res_id;
+  END IF;
+END;
+/
