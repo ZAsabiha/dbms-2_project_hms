@@ -23,6 +23,17 @@ show user
 SHOW CON_NAME;
 SELECT username, account_status, common FROM dba_users WHERE username = 'HOTELMANAGEMENT';
 
+CREATE TABLE Admin (
+    id NUMBER PRIMARY KEY,
+    name VARCHAR2(100) NOT NULL,
+    email VARCHAR2(100) NOT NULL UNIQUE,
+    password VARCHAR2(255) NOT NULL,
+    role VARCHAR2(50) DEFAULT 'admin' NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
 INSERT INTO Admin VALUES (1, 'Admin', 'admin@example.com', 'admin123', 'admin', SYSTIMESTAMP, SYSTIMESTAMP);
 COMMIT;
 
@@ -319,17 +330,6 @@ BEGIN
     RETURN v_total * 1.10;
 END;
 /
-CREATE TABLE Admin (
-    id NUMBER PRIMARY KEY,
-    name VARCHAR2(100) NOT NULL,
-    email VARCHAR2(100) NOT NULL UNIQUE,
-    password VARCHAR2(255) NOT NULL,
-    role VARCHAR2(50) DEFAULT 'admin' NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
-
 
 CREATE SEQUENCE admin_seq
 START WITH 1
