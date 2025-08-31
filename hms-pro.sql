@@ -319,3 +319,50 @@ BEGIN
     RETURN v_total * 1.10;
 END;
 /
+CREATE TABLE Admin (
+    id NUMBER PRIMARY KEY,
+    name VARCHAR2(100) NOT NULL,
+    email VARCHAR2(100) NOT NULL UNIQUE,
+    password VARCHAR2(255) NOT NULL,
+    role VARCHAR2(50) DEFAULT 'admin' NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
+
+CREATE SEQUENCE admin_seq
+START WITH 1
+INCREMENT BY 1
+NOCACHE;
+
+CREATE OR REPLACE TRIGGER admin_before_insert
+BEFORE INSERT ON Admin
+FOR EACH ROW
+BEGIN
+    IF :NEW.id IS NULL THEN
+        :NEW.id := admin_seq.NEXTVAL;
+    END IF;
+END;
+/
+
+CREATE OR REPLACE FUNCTION CHECK_AVAILABILITY(
+    p_room_id IN NUMBER,
+    p_check_in IN DATE,
+    p_check_out IN DATE
+) RETURN NUMBER
+IS
+    v_count NUMBER;
+BEGIN
+    SELECT COUNT(*) INTO v_count
+    FROM RESERVATION
+    WHERE ROOM_ID = p_room_id
+      AND STATUS IN ('Booked','CheckedIn')
+      AND (p_check_in < CHECK_OUT AND p_check_out > CHECK_IN);
+
+    IF v_count = 0 THEN
+        RETURN 1; -- available
+    ELSE
+        RETURN 0; -- not available
+    END IF;
+END;
